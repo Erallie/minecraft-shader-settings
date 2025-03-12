@@ -25,7 +25,7 @@ jobs:
       - name: Get current date and time
         id: get_date
         run: |
-          echo "LAST_UPDATED=$(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_ENV
+          echo "LAST_UPDATED=$(date -u +"%B %d, %Y at %I:%M %p UTC")" >> $GITHUB_ENV
 
       - name: Delete existing release and tag
         run: |
