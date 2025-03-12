@@ -22,6 +22,11 @@ jobs:
           git log --format="- %s" HEAD~$(git rev-list --count HEAD)..HEAD >> $GITHUB_ENV || echo "No commits found." >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      - name: Get current date and time
+        id: get_date
+        run: |
+          echo "LAST_UPDATED=$(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_ENV
+
       - name: Delete existing release and tag
         run: |
           TAG_NAME="v1.0.0"  # Change this to your desired tag name
@@ -45,7 +50,9 @@ jobs:
           body: |
             Changes in this release:
             ${{ env.COMMIT_MESSAGES }}
+
+            **Last Updated:** ${{ env.LAST_UPDATED }}
           files: |
-            GozarCraft-Complementary-Settings.txt
+            GozarCraft - Complementary Settings.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
