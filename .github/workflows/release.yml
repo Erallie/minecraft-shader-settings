@@ -6,7 +6,7 @@ on:
       - main  # Change this to your default branch if it's not 'main'
 
 permissions:
-  contents: write  # Required to create releases and delete tags
+  contents: write  # Required to create releases
 
 jobs:
   create_release:
@@ -18,8 +18,8 @@ jobs:
       - name: Get commit messages
         id: get_commits
         run: |
-          # Get the last tag (previous release)
-          LAST_TAG=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          # Get the last tag (previous release), or set to a default if none exist
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "LAST_TAG=${LAST_TAG}" >> $GITHUB_ENV
 
           # Get commit messages from the last tag to the current commit
