@@ -5,6 +5,10 @@ on:
     branches:
       - main  # Change this to your default branch if it's not 'main'
 
+permissions:
+  contents: write  # Required to create releases
+  delete: write    # Required to delete releases and tags
+
 jobs:
   create_release:
     runs-on: ubuntu-latest
@@ -15,11 +19,24 @@ jobs:
       - name: Get commit messages
         id: get_commits
         run: |
-          # Get the commit messages for the last push
           echo "COMMIT_MESSAGES<<EOF" >> $GITHUB_ENV
-          # Use git log to get commit messages
           git log --format="- %s" HEAD~$(git rev-list --count HEAD)..HEAD >> $GITHUB_ENV || echo "No commits found." >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
+      - name: Delete existing release and tag
+        run: |
+          TAG_NAME="v1.0.0"  # Change this to your desired tag name
+          # Delete the existing release if it exists
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Deleting existing release $TAG_NAME..."
+            gh release delete "$TAG_NAME" -y
+          fi
+          # Delete the existing tag if it exists
+          if git tag -l | grep -q "$TAG_NAME"; then
+            echo "Deleting existing tag $TAG_NAME..."
+            git tag -d "$TAG_NAME"
+            git push origin :refs/tags/"$TAG_NAME"
+          fi
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
