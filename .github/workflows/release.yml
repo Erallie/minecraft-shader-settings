@@ -27,21 +27,15 @@ jobs:
           git log --format="- %s" "${LAST_TAG}..HEAD" >> $GITHUB_ENV || echo "No commits found." >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Get current date and time
-        id: get_date
-        run: |
-          echo "LAST_UPDATED=$(date -u +"%B %e, %Y at %l:%M %p UTC")" >> $GITHUB_ENV
-
-      - name: Create or Update Release
+      - name: Create Release
+        id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v1.0.0  # Use the same tag for the release
-          name: Static Release
+          tag_name: v${{ github.run_number }}  # Use a unique tag for each release
+          name: Release v${{ github.run_number }}
           body: |
             Changes in this release:
             ${{ env.COMMIT_MESSAGES }}
-
-            **Last Updated:** ${{ env.LAST_UPDATED }}
           files: |
             GozarCraft - Complementary Settings.txt
         env:
