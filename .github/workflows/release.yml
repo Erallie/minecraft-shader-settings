@@ -45,5 +45,7 @@ jobs:
           body: |
             Changes in this release:
             ${{ env.COMMIT_MESSAGES }}
+          files: |
+            GozarCraft - Complementary Settings.txt  # Path to the file to attach
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
