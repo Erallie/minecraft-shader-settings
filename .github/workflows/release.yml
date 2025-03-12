@@ -1,0 +1,32 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch if it's not 'main'
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get commit messages
+        id: get_commits
+        run: |
+          # Get the commit messages for the last push
+          echo "COMMIT_MESSAGES<<EOF" >> $GITHUB_ENV
+          git log --format="- %s" HEAD^..HEAD >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.0  # You can modify this to use a dynamic versioning scheme
+          name: Release v1.0.0
+          body: |
+            Changes in this release:
+            ${{ env.COMMIT_MESSAGES }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
