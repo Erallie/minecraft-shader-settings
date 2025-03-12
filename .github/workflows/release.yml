@@ -36,7 +36,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.0.0  # Use the same tag for the release
-          name: Release v1.0.0
+          name: Static Release
           body: |
             Changes in this release:
             ${{ env.COMMIT_MESSAGES }}
