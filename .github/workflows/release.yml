@@ -46,6 +46,6 @@ jobs:
             Changes in this release:
             ${{ env.COMMIT_MESSAGES }}
           files: |
-            GozarCraft - Complementary Settings.txt
+            GozarCraft-Complementary-Settings.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
