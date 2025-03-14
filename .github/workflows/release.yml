@@ -38,5 +38,8 @@ jobs:
             ${{ env.COMMIT_MESSAGES }}
           files: |
             GozarCraft-Complementary-Settings.txt
+            images/announcement.png
+            images/broadcast.png
+            images/warning-2.png
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
