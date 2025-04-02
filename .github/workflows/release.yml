@@ -15,17 +15,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get commit messages
-        id: get_commits
+        
+      - name: Get all pushed commits
+        id: commit_info
+        shell: pwsh
         run: |
-          # Get the last tag (previous release), or set to a default if none exist
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "LAST_TAG=${LAST_TAG}" >> $GITHUB_ENV
+            $payload = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
+            $allCommits = $payload.commits
+            $messages = ""
 
-          # Get commit messages from the last tag to the current commit
-          echo "COMMIT_MESSAGES<<EOF" >> $GITHUB_ENV
-          git log --format="- %s" "${LAST_TAG}..HEAD" >> $GITHUB_ENV || echo "No commits found." >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+            foreach ($commit in $allCommits) {
+                $lines = $commit.message -split "`n"
+                $summary = $lines[0]
+                $messages += "- **$summary**`n"
+
+                if ($lines.Length -gt 1) {
+                    $bodyLines = $lines[1..($lines.Length - 1)]
+                    foreach ($line in $bodyLines) {
+                        $trimmed = $line.Trim()
+                        if ($trimmed) {
+                            $messages += "  - $trimmed`n"
+                        }
+                    }
+                }
+            }
+
+            # Write raw multi-line string to a temporary file
+            Set-Content -Path commit_message.txt -Value $messages -Encoding UTF8
+
+            # Set output using file reference
+            echo "description<<EOF" >> $env:GITHUB_OUTPUT
+            Get-Content commit_message.txt | ForEach-Object { echo $_ } >> $env:GITHUB_OUTPUT
+            echo "EOF" >> $env:GITHUB_OUTPUT
 
       - name: Create Release
         id: create_release
@@ -35,7 +56,7 @@ jobs:
           name: Release v1.0.${{ github.run_number }}
           body: |
             Changes in this release:
-            ${{ env.COMMIT_MESSAGES }}
+            ${{ steps.commit_info.outputs.description }}
           files: |
             GozarCraft-Complementary-Settings.txt
         env:
